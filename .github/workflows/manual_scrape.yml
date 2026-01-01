@@ -1,46 +1,31 @@
-name: Manual Movie Scrape
+name: Manual Scrape
 
 on:
   workflow_dispatch:
 
 jobs:
-  run-scraper:
-    runs-on: ubuntu-22.04
+  scrape:
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Install System Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y wget gnupg unzip
-
-      - name: Install Google Chrome
-        run: |
-          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-          sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
-          sudo apt-get update
-          sudo apt-get install -y google-chrome-stable
-          google-chrome --version
+      - name: Checkout repository
+      - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.12'
 
-      - name: Install Python Dependencies
+      - name: Install dependencies
         run: |
-          pip install --upgrade pip
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run Scraper Script
-        run: |
-          python movie_scraper.py
+      - name: Run scraper
+        run: python scrape.py
 
-      - name: Upload Output JSON
+      - name: Upload results
         uses: actions/upload-artifact@v4
         with:
-          name: stream-data
-          path: stream_data.json
-          if-no-files-found: warn
+          name: scrape-results
+          path: output/
